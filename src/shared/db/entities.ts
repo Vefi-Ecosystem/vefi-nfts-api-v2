@@ -19,4 +19,4 @@ export const constructEntity = (
     )(name, def, opts);
 
 export const bindEntityToHelpers = (entity: ModelStatic<Model<any, any>>, hlprs: ModelHelperFunctions) =>
-    merge(entity, { ...hlprs });
+    merge(entity, { ...hlprs }, { ORM: sequelize });

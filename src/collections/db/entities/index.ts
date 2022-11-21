@@ -1,3 +1,3 @@
-export { default as collections } from "./collection";
-export { default as nfts } from "./nft";
-export { default as events } from "./event";
+export { default as CollectionDAO } from "./collection";
+export { default as NFTsDAO } from "./nft";
+export { default as EventsDAO } from "./event";
