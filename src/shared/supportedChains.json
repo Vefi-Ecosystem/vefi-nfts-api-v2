@@ -1,0 +1,34 @@
+{
+    "testnet": {
+        "97": {
+            "name": "Binance Smartchain Testnet",
+            "rpcUrl": "https://data-seed-prebsc-1-s3.binance.org:8545"
+        }
+    },
+    "mainnet": {
+        "56": {
+            "name": "Binance Smartchain",
+            "rpcUrl": "https://bsc-dataseed4.defibit.io"
+        },
+        "311": {
+            "name": "Omax Chain",
+            "rpcUrl": "https://mainapi.omaxray.com"
+        },
+        "32520": {
+            "name": "Bitgert Mainnet",
+            "rpcUrl": "https://nodes.vefinetwork.org/bitgert"
+        },
+        "86": {
+            "name": "Gatechain",
+            "rpcUrl": "https://evm.gatenode.cc"
+        },
+        "888": {
+            "name": "Wanchain",
+            "rpcUrl": "https://gwan-ssl.wandevs.org:56891"
+        },
+        "66": {
+            "name": "OKX Chain Mainnet",
+            "rpcUrl": "https://exchainrpc.okex.org"
+        }
+    }
+}
