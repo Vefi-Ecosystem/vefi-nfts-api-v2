@@ -44,3 +44,14 @@ export const watchActions = ary((chainId: string) => {
 
   provider.on({ address, topics: [collectionDeployedHash] }, handleCollectionDeployedEvent(chainId));
 });
+
+export const propagatePastActionsEvents = ary(async (chainId: string) => {
+  try {
+    const chainIdInt = parseInt(chainId);
+    const url = chain[chainIdInt as unknown as keyof typeof chain].rpcUrl;
+    const address = actions[chainIdInt as unknown as keyof typeof actions];
+    const provider = new JsonRpcProvider(url, chainIdInt);
+
+    const latestBlock = await provider.getBlockNumber();
+  } catch (error: any) {}
+});
