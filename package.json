@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write **/**/*.{js,json,ts}",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "dev": "cross-env DEBUG=app ts-node src/index"
   },
   "repository": {
     "type": "git",

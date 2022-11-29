@@ -170,12 +170,18 @@ const handleApprovalForAllEvent = ary(
 
 export const watchCollection = ary((chainId: string, address: string) => {
   const chainIdInt = parseInt(chainId);
-  const url = chain[chainIdInt as unknown as keyof typeof chain].rpcUrl;
-  const provider = new JsonRpcProvider(url, chainIdInt);
+  const url = chain[chainIdInt as unknown as keyof typeof chain]?.rpcUrl;
+  if (!!url) {
+    const provider = new JsonRpcProvider(url, chainIdInt);
 
-  provider.on({ address, topics: [transferEventHash] }, handleTransferEvent(chainId, address));
-  provider.on({ address, topics: [ownershipTransferredHash] }, handleOwnershipTransferEvent(chainId, address));
-  provider.on({ address, topics: [approvalForAllHash] }, handleApprovalForAllEvent(chainId, address));
+    provider.on({ address, topics: [transferEventHash] }, handleTransferEvent(hexValue(chainIdInt), address));
+    provider.on(
+      { address, topics: [ownershipTransferredHash] },
+      handleOwnershipTransferEvent(hexValue(chainIdInt), address)
+    );
+    provider.on({ address, topics: [approvalForAllHash] }, handleApprovalForAllEvent(hexValue(chainIdInt), address));
+    logger("Now watching collection: %s", address);
+  }
 }, 2);
 
 export const propagatePastCollectionEvents = ary((chainId: string) => {
@@ -183,48 +189,53 @@ export const propagatePastCollectionEvents = ary((chainId: string) => {
     try {
       const chainIdInt = parseInt(chainId);
       const url = chain[chainIdInt as unknown as keyof typeof chain].rpcUrl;
-      const provider = new JsonRpcProvider(url, chainIdInt);
-      const latestBlock = await provider.getBlockNumber();
 
-      const allCollections: Array<any> = await CollectionDAO.getAllCollections();
+      if (!!url) {
+        const provider = new JsonRpcProvider(url, chainIdInt);
+        const latestBlock = await provider.getBlockNumber();
 
-      forEach(allCollections, val => {
-        (async () => {
-          let lastCollectionBlock = await getLastBlockNumberForCollection(val.address, chainId);
+        const allCollections: Array<any> = await CollectionDAO.getAllCollections({
+          where: { chainId: hexValue(chainIdInt) }
+        });
 
-          if (lastCollectionBlock === 0) {
-            lastCollectionBlock = latestBlock;
-            await propagateLastBlockNumberForCollection(val.address, chainId, hexValue(latestBlock));
-          }
+        forEach(allCollections, val => {
+          (async () => {
+            let lastCollectionBlock = await getLastBlockNumberForCollection(val.address, hexValue(chainIdInt));
 
-          const logs = await provider.getLogs({
-            fromBlock: hexValue(lastCollectionBlock + 1),
-            toBlock: hexValue(latestBlock),
-            address: val.address
-          });
+            if (lastCollectionBlock === 0) {
+              lastCollectionBlock = latestBlock;
+              await propagateLastBlockNumberForCollection(val.address, hexValue(chainIdInt), hexValue(latestBlock));
+            }
 
-          forEach(logs, log => {
-            (async () => {
-              const { name } = collectionInteface.parseLog(log);
+            const logs = await provider.getLogs({
+              fromBlock: hexValue(lastCollectionBlock + 1),
+              toBlock: hexValue(latestBlock),
+              address: val.address
+            });
 
-              switch (name) {
-                case "Transfer":
-                  await handleTransferEvent(chainId, val.address)(log);
-                  break;
-                case "OwnershipTransferred":
-                  await handleOwnershipTransferEvent(chainId, val.address)(log);
-                  break;
-                case "ApprovalForAll":
-                  await handleApprovalForAllEvent(chainId, val.address)(log);
-                  break;
-                default:
-                  break;
-              }
-            })();
-          });
-        })();
-        watchCollection(chainId, val.address);
-      });
+            forEach(logs, log => {
+              (async () => {
+                const { name } = collectionInteface.parseLog(log);
+
+                switch (name) {
+                  case "Transfer":
+                    await handleTransferEvent(hexValue(chainIdInt), val.address)(log);
+                    break;
+                  case "OwnershipTransferred":
+                    await handleOwnershipTransferEvent(hexValue(chainIdInt), val.address)(log);
+                    break;
+                  case "ApprovalForAll":
+                    await handleApprovalForAllEvent(hexValue(chainIdInt), val.address)(log);
+                    break;
+                  default:
+                    break;
+                }
+              })();
+            });
+          })();
+          watchCollection(chainId, val.address);
+        });
+      }
     } catch (error: any) {
       logger(error.message);
     }

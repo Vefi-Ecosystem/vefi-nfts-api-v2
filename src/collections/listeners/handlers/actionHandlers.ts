@@ -43,41 +43,49 @@ const handleCollectionDeployedEvent = ary(
 
 export const watchActions = ary((chainId: string) => {
   const chainIdInt = parseInt(chainId);
-  const url = chain[chainIdInt as unknown as keyof typeof chain].rpcUrl;
+  const url = chain[chainIdInt as unknown as keyof typeof chain]?.rpcUrl;
   const address = actions[chainIdInt as unknown as keyof typeof actions];
-  const provider = new JsonRpcProvider(url, chainIdInt);
 
-  provider.on({ address, topics: [collectionDeployedHash] }, handleCollectionDeployedEvent(chainId, address));
+  if (!!url && !!address) {
+    const provider = new JsonRpcProvider(url, chainIdInt);
+    provider.on(
+      { address, topics: [collectionDeployedHash] },
+      handleCollectionDeployedEvent(hexValue(chainIdInt), address)
+    );
+    logger("Now watching actions: %s", address);
+  }
 }, 1);
 
 export const propagatePastActionsEvents = ary((chainId: string) => {
   (async () => {
     try {
       const chainIdInt = parseInt(chainId);
-      const url = chain[chainIdInt as unknown as keyof typeof chain].rpcUrl;
+      const url = chain[chainIdInt as unknown as keyof typeof chain]?.rpcUrl;
       const address = actions[chainIdInt as unknown as keyof typeof actions];
-      const provider = new JsonRpcProvider(url, chainIdInt);
 
-      const latestBlock = await provider.getBlockNumber();
-      let lastActionBlock = await getLastBlockNumberForActions(address, chainId);
+      if (!!url && !!address) {
+        const provider = new JsonRpcProvider(url, chainIdInt);
+        const latestBlock = await provider.getBlockNumber();
+        let lastActionBlock = await getLastBlockNumberForActions(address, hexValue(chainIdInt));
 
-      if (lastActionBlock === 0) {
-        lastActionBlock = latestBlock;
-        await propagateLastBlockNumberForActions(address, chainId, hexValue(latestBlock));
+        if (lastActionBlock === 0) {
+          lastActionBlock = latestBlock;
+          await propagateLastBlockNumberForActions(address, hexValue(chainIdInt), hexValue(latestBlock));
+        }
+
+        const logs = await provider.getLogs({
+          fromBlock: hexValue(lastActionBlock + 1),
+          toBlock: hexValue(latestBlock),
+          topics: [collectionDeployedHash],
+          address
+        });
+
+        forEach(logs, log => {
+          (async () => {
+            await handleCollectionDeployedEvent(hexValue(chainIdInt), address)(log);
+          })();
+        });
       }
-
-      const logs = await provider.getLogs({
-        fromBlock: hexValue(lastActionBlock + 1),
-        toBlock: hexValue(latestBlock),
-        topics: [collectionDeployedHash],
-        address
-      });
-
-      forEach(logs, log => {
-        (async () => {
-          await handleCollectionDeployedEvent(chainId, address)(log);
-        })();
-      });
     } catch (error: any) {
       logger(error.message);
     }

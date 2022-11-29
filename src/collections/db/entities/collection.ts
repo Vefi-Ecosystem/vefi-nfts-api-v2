@@ -1,4 +1,4 @@
-import { DataTypes, FindOptions } from "sequelize";
+import { CountOptions, DataTypes, FindOptions } from "sequelize";
 import { v4 } from "uuid";
 import { isAddress } from "@ethersproject/address";
 import { constructEntity, bindEntityToHelpers } from "../../../shared/db";
@@ -58,6 +58,11 @@ export default bindEntityToHelpers(collectionEntity, {
         .findOne(opts)
         .then(model => resolve(model?.toJSON()))
         .catch(reject);
+    });
+  },
+  countAllCollections: (opts?: CountOptions) => {
+    return new Promise((resolve, reject) => {
+      collectionEntity.count(opts).then(resolve).catch(reject);
     });
   }
 });
