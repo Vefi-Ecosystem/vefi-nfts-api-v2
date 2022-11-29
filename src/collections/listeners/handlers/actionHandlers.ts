@@ -11,6 +11,7 @@ import chains from "../../../shared/supportedChains.json";
 import { NODE_ENV } from "../../../shared/environment";
 import actions from "../../assets/actions.json";
 import { getLastBlockNumberForActions, propagateLastBlockNumberForActions } from "../../cache";
+import { watchCollection } from "./collectionHandlers";
 
 const chain = (NODE_ENV !== "production" ? chains["testnet"] : chains["mainnet"]) as any;
 const actionsInterface = new Interface(actionAbi);
@@ -31,6 +32,7 @@ const handleCollectionDeployedEvent = ary(
         parseInt(BigNumber.from(mintStartTime).toHexString())
       );
       logger("New collection deployed: %s", collectionObj.address);
+      watchCollection(chainId, collectionObj.address);
       await propagateLastBlockNumberForActions(actions, chainId, log.blockNumber);
     } catch (error: any) {
       logger(error.message);
