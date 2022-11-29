@@ -41,13 +41,13 @@ const eventEntity = constructEntity("Event", {
 
 export default bindEntityToHelpers(eventEntity, {
   addEventToDB: (
-    eventType: string,
+    eventType: "Mint" | "Ownership_Transferred" | "Burn" | "Transfer" | "Approval_For_All",
     from: string,
     timestamp: number,
     transactionHash: string,
     eventData: object,
     collection: string,
-    tokenId: number,
+    tokenId: number | null,
     chainId: string
   ) => {
     return new Promise((resolve, reject) => {

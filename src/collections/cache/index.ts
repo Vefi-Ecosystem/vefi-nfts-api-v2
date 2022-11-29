@@ -1,6 +1,6 @@
 import { cacheItem, itemExists, getItem } from "../../shared/cache";
 
-const cacheKeyPrefix = "redis::cache::collections";
+const cacheKeyPrefix = "redis::cache";
 
 export async function propagateLastBlockNumberForCollection(
   collection: string,
@@ -8,7 +8,7 @@ export async function propagateLastBlockNumberForCollection(
   blockNumber: string
 ): Promise<void> {
   try {
-    const key = cacheKeyPrefix.concat(`::${collection}::${chainId}`);
+    const key = cacheKeyPrefix.concat(`::collections::${collection}::${chainId}`);
     await cacheItem(key, blockNumber);
   } catch (error: any) {
     return Promise.reject(error);
@@ -17,7 +17,7 @@ export async function propagateLastBlockNumberForCollection(
 
 export async function getLastBlockNumberForCollection(collection: string, chainId: string): Promise<number> {
   try {
-    const key = cacheKeyPrefix.concat(`::${collection}::${chainId}`);
+    const key = cacheKeyPrefix.concat(`::collections::${collection}::${chainId}`);
     const exists = await itemExists(key);
     const lastBlock = exists ? parseInt((await getItem(key)) as string) : 0;
     return Promise.resolve(lastBlock);
@@ -32,7 +32,7 @@ export async function propagateLastBlockNumberForActions(
   blockNumber: string
 ): Promise<void> {
   try {
-    const key = cacheKeyPrefix.concat(`::${actions}::${chainId}`);
+    const key = cacheKeyPrefix.concat(`::actions::${actions}::${chainId}`);
     await cacheItem(key, blockNumber);
   } catch (error: any) {
     return Promise.reject(error);
@@ -41,7 +41,7 @@ export async function propagateLastBlockNumberForActions(
 
 export async function getLastBlockNumberForActions(actions: string, chainId: string): Promise<number> {
   try {
-    const key = cacheKeyPrefix.concat(`::${actions}::${chainId}`);
+    const key = cacheKeyPrefix.concat(`::actions::${actions}::${chainId}`);
     const exists = await itemExists(key);
     const lastBlock = exists ? parseInt((await getItem(key)) as string) : 0;
     return Promise.resolve(lastBlock);
