@@ -1,12 +1,17 @@
 import { Sequelize, Model, ModelAttributes, ModelOptions, ModelStatic } from "sequelize";
 import { ary, merge } from "lodash";
 import { DB_URI } from "../environment";
+import log from "../log";
 
 type ModelHelperFunctions = {
   [name: string]: (...args: any[]) => Promise<any>;
 };
 
-const sequelize = new Sequelize(DB_URI, { dialect: "postgres", define: { underscored: true } });
+const sequelize = new Sequelize(DB_URI, {
+  dialect: "postgres",
+  define: { underscored: true },
+  logging: sql => log(sql)
+});
 
 export const constructEntity = (
   name: string,

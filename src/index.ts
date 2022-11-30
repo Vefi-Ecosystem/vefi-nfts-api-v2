@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET");
   next();
 });
-app.use("/", router);
+app.use("/api", router);
 
 app.listen(port, () => {
   initRedisConnection();
