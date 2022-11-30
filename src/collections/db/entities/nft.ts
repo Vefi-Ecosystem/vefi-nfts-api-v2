@@ -1,4 +1,4 @@
-import { DataTypes, FindOptions } from "sequelize";
+import { CountOptions, DataTypes, FindOptions } from "sequelize";
 import { v4 } from "uuid";
 import { isAddress } from "@ethersproject/address";
 import { constructEntity, bindEntityToHelpers } from "../../../shared/db";
@@ -64,6 +64,11 @@ export default bindEntityToHelpers(nftEntity, {
   removeNFTFromDB: (collection: string, tokenId: number, chainId: string) => {
     return new Promise((resolve, reject) => {
       nftEntity.destroy({ where: { collection, tokenId, chainId } }).then(resolve).catch(reject);
+    });
+  },
+  countAllNFTs: (opts?: CountOptions) => {
+    return new Promise((resolve, reject) => {
+      nftEntity.count(opts).then(resolve).catch(reject);
     });
   }
 });
