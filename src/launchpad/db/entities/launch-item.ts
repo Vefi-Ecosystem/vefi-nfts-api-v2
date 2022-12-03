@@ -44,5 +44,13 @@ export default bindEntityToHelpers(launchItemEntity, {
         .then(model => resolve(model?.toJSON()))
         .catch(reject);
     });
+  },
+  getAllLaunchItems: (opts?: FindOptions) => {
+    return new Promise((resolve, reject) => {
+      launchItemEntity
+        .findAll(opts)
+        .then(models => resolve(models.map(model => model.toJSON())))
+        .catch(reject);
+    });
   }
 });

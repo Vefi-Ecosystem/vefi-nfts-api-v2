@@ -31,7 +31,7 @@ const handleCollectionDeployedEvent = ary(
         owner,
         parseInt(BigNumber.from(mintStartTime).toHexString())
       );
-      logger("New collection deployed: %s", collectionObj.address);
+      logger("New collection deployed: %s", JSON.stringify(collectionObj));
       watchCollection(chainId, collectionObj.address);
       await propagateLastBlockNumberForActions(actions, chainId, log.blockNumber);
     } catch (error: any) {
@@ -69,12 +69,12 @@ export const propagatePastActionsEvents = ary((chainId: string) => {
         let lastActionBlock = await getLastBlockNumberForActions(address, hexValue(chainIdInt));
 
         if (lastActionBlock === 0) {
-          lastActionBlock = latestBlock;
+          lastActionBlock = latestBlock - 1;
           await propagateLastBlockNumberForActions(address, hexValue(chainIdInt), hexValue(latestBlock));
         }
 
         const logs = await provider.getLogs({
-          fromBlock: hexValue(lastActionBlock + 1),
+          fromBlock: hexValue(lastActionBlock),
           toBlock: hexValue(latestBlock),
           topics: [collectionDeployedHash],
           address

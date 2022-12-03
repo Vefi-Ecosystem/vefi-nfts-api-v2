@@ -203,12 +203,12 @@ export const propagatePastCollectionEvents = ary((chainId: string) => {
             let lastCollectionBlock = await getLastBlockNumberForCollection(val.address, hexValue(chainIdInt));
 
             if (lastCollectionBlock === 0) {
-              lastCollectionBlock = latestBlock;
+              lastCollectionBlock = latestBlock - 1;
               await propagateLastBlockNumberForCollection(val.address, hexValue(chainIdInt), hexValue(latestBlock));
             }
 
             const logs = await provider.getLogs({
-              fromBlock: hexValue(lastCollectionBlock + 1),
+              fromBlock: hexValue(lastCollectionBlock),
               toBlock: hexValue(latestBlock),
               address: val.address
             });
