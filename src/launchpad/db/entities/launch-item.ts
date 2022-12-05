@@ -52,5 +52,10 @@ export default bindEntityToHelpers(launchItemEntity, {
         .then(models => resolve(models.map(model => model.toJSON())))
         .catch(reject);
     });
+  },
+  countAllLaunchItems: (opts?: CountOptions) => {
+    return new Promise((resolve, reject) => {
+      launchItemEntity.count(opts).then(resolve).catch(reject);
+    });
   }
 });
