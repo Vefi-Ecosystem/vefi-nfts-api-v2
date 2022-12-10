@@ -1,4 +1,4 @@
-import { ary, forEach } from "lodash";
+import { ary, forEach, multiply } from "lodash";
 import { Interface } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { hexValue } from "@ethersproject/bytes";
@@ -29,7 +29,7 @@ const handleCollectionDeployedEvent = ary(
         chainId,
         address,
         owner,
-        parseInt(BigNumber.from(mintStartTime).toHexString())
+        multiply(parseInt(BigNumber.from(mintStartTime).toHexString()), 1000)
       );
       logger("New collection deployed: %s", JSON.stringify(collectionObj));
       watchCollection(chainId, collectionObj.address);

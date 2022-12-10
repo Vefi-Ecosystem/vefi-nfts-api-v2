@@ -1,4 +1,4 @@
-import { ary, forEach } from "lodash";
+import { ary, forEach, multiply } from "lodash";
 import { Interface } from "@ethersproject/abi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { hexValue } from "@ethersproject/bytes";
@@ -26,8 +26,8 @@ const handleLaunchItemCreatedEvent = ary((chainId: string, launchpad: string) =>
       chainId,
       launchId,
       collection,
-      parseInt(BigNumber.from(startTime).toHexString()),
-      parseInt(BigNumber.from(endTime).toHexString()),
+      multiply(parseInt(BigNumber.from(startTime).toHexString()), 1000),
+      multiply(parseInt(BigNumber.from(endTime).toHexString()), 1000),
       parseInt(BigNumber.from(price).toHexString())
     );
     logger("New launch item created: %s", JSON.stringify(launchItem));
