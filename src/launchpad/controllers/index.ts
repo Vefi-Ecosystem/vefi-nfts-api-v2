@@ -90,11 +90,17 @@ export default assign(
           }
         }
 
-        const result = await LaunchpadDAO.getAllLaunchItems({
+        const totalNumberOfLaunchItems = await LaunchpadDAO.countAllLaunchItems({ where });
+        const paginizedLaunchItems = await LaunchpadDAO.getAllLaunchItems({
           where,
           limit: 30,
           offset: query.page ? subtract(parseInt(query.page as string), 1) * 30 : 0
         });
+
+        const result = {
+          items: paginizedLaunchItems,
+          itemsCount: totalNumberOfLaunchItems
+        };
 
         return res.status(200).json({ result });
       } catch (error: any) {
