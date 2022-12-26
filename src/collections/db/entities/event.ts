@@ -3,7 +3,7 @@ import { v4 } from "uuid";
 import { isAddress } from "@ethersproject/address";
 import { constructEntity, bindEntityToHelpers } from "../../../shared/db";
 
-const eventEntity = constructEntity("Event", {
+const eventEntity = constructEntity("CollectionEvent", {
   id: { type: DataTypes.UUID, primaryKey: true },
   eventType: {
     type: DataTypes.ENUM("Mint", "Ownership_Transferred", "Burn", "Transfer", "Approval_For_All"),
